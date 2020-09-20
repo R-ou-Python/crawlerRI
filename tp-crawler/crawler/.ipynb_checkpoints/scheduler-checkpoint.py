@@ -104,7 +104,6 @@ class Scheduler():
         
         """
         TIME_LIMIT_BETWEEN_REQUESTS não é a melhor métrica de variável para isso.
-        Melhor tática possível é implementar exponential backoff
         """
     def can_fetch_page(self,obj_url):
         """
