@@ -1,12 +1,12 @@
 from bs4 import BeautifulSoup
 from threading import Thread
 import requests
-from urllib.parse import urlparse,urljoin
+from urllib.parse import urlparse, urlunparse, urljoin
 
 class PageFetcher(Thread):
     def __init__(self, obj_scheduler):
         self.obj_scheduler = obj_scheduler
-
+        self.crawlerName = "Nome do coletor"
 
 
 
@@ -16,11 +16,14 @@ class PageFetcher(Thread):
 
             obj_url: Instancia da classe ParseResult com a URL a ser requisitada.
         """
-        response = None
-
-
-        return response.content
-
+        headers = {'user-agent': self.crawlerName}
+        response = requests.get(urlunparse(obj_url), headers=headers)
+        
+        if 'text/html' in response.headers['Content-Type']:
+            return response.content
+        
+        return None
+       
     def discover_links(self,obj_url,int_depth,bin_str_content):
         """
         Retorna os links do conteúdo bin_str_content da página já requisitada obj_url
