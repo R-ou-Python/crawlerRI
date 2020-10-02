@@ -57,6 +57,7 @@ class PageFetcher(Thread):
             binary_content = self.request_url(url_returned[0])
         
             if binary_content != None:
+                print(urlunparse(url_returned[0]))
                 return self.discover_links(url_returned[0], url_returned[1], binary_content)
             else:
                 return None
@@ -73,8 +74,9 @@ class PageFetcher(Thread):
             # Pega todos os conjuntos de tuplas da crawl (retorno da discovery_links)
             generator = self.crawl_new_url()
             if generator != None:
+                self.obj_scheduler.count_fetched_page()
                 # Para cada tupla do conjunto, verificar se é possível adicionar, se é, adiciona no contador.
                 for url_discovered,depth_url_discovered in generator: 
                     if self.obj_scheduler.can_add_page(url_discovered, depth_url_discovered):
                         self.obj_scheduler.add_new_page(url_discovered, depth_url_discovered)
-                        self.obj_scheduler.count_fetched_page()
+                    
