@@ -28,21 +28,25 @@ class PageFetcher(Thread):
         """
         soup = BeautifulSoup(bin_str_content, "html.parser")
         dominio = obj_url.netloc
-
+        
         for link in soup.select('a'):
-            obj_new_url = link.attrs['href']
-            urlParse = urlparse(obj_new_url)
             
-            # Quando a URL é encurtada
-            if urlParse.netloc == '':
-                new_url = obj_url.scheme + '://' + dominio + '/' + urlParse.path
-                urlParse = urlparse(new_url)
+            if link.get('href') == None:
+                pass
+            else:
+                obj_new_url = link.attrs['href']
+                urlParse = urlparse(obj_new_url)
             
-            int_new_depth = 0
-            if urlParse.netloc == dominio:
-                int_new_depth = int_depth+1
-                        
-            yield(urlParse, int_new_depth)
+                # Quando a URL é encurtada
+                if urlParse.netloc == '':
+                    new_url = obj_url.scheme + '://' + dominio + '/' + urlParse.path
+                    urlParse = urlparse(new_url)
+
+                int_new_depth = 0
+                if urlParse.netloc == dominio:
+                    int_new_depth = int_depth+1
+
+                yield(urlParse, int_new_depth)
         
     def crawl_new_url(self):
         """
@@ -57,6 +61,7 @@ class PageFetcher(Thread):
             binary_content = self.request_url(url_returned[0])
         
             if binary_content != None:
+                print(urlunparse(url_returned[0]))
                 return self.discover_links(url_returned[0], url_returned[1], binary_content)
             else:
                 return None
@@ -73,8 +78,9 @@ class PageFetcher(Thread):
             # Pega todos os conjuntos de tuplas da crawl (retorno da discovery_links)
             generator = self.crawl_new_url()
             if generator != None:
+                self.obj_scheduler.count_fetched_page()
                 # Para cada tupla do conjunto, verificar se é possível adicionar, se é, adiciona no contador.
                 for url_discovered,depth_url_discovered in generator: 
                     if self.obj_scheduler.can_add_page(url_discovered, depth_url_discovered):
                         self.obj_scheduler.add_new_page(url_discovered, depth_url_discovered)
-                        self.obj_scheduler.count_fetched_page()
+                    
