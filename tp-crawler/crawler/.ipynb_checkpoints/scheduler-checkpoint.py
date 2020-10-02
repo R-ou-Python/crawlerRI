@@ -4,6 +4,7 @@ from collections import OrderedDict
 from crawler.domain import Domain
 from urllib.parse import urlparse, urlunparse
 import time 
+import urllib.robotparser
 
 class Scheduler():
     #tempo (em segundos) entre as requisições
@@ -28,6 +29,10 @@ class Scheduler():
         self.dic_url_per_domain = OrderedDict()
         self.set_discovered_urls = set()
         self.dic_robots_per_domain = {}
+        
+        for url in arr_urls_seeds:
+            urlParse = urlparse(url)
+            self.add_new_page(urlParse,0)
 
 
     @synchronized
@@ -104,12 +109,21 @@ class Scheduler():
         
         """
         TIME_LIMIT_BETWEEN_REQUESTS não é a melhor métrica de variável para isso.
+        Melhor tática possível é implementar exponential backoff
         """
     def can_fetch_page(self,obj_url):
         """
         Verifica, por meio do robots.txt se uma determinada URL pode ser coletada
         """
+        
+        if (obj_url.netloc in self.dic_robots_per_domain):
+            robotFileParser = self.dic_robots_per_domain[obj_url.netloc]
+        else:
+            robotFileParser = urllib.robotparser.RobotFileParser()
+            robotsTxt = obj_url.scheme + '://' + obj_url.netloc + '/robots.txt'
+            robotFileParser.set_url(robotsTxt)
+            robotFileParser.read()
+            self.dic_robots_per_domain[obj_url.netloc] = robotFileParser
 
-
-
-        return False
+        return robotFileParser.can_fetch("*", urlunparse(obj_url))
+      

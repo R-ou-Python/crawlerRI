@@ -31,8 +31,8 @@ class Scheduler():
         self.dic_robots_per_domain = {}
         
         for url in arr_urls_seeds:
-            urlparse = urlparse(url)
-            self.add_new_page(urlparse)
+            urlParse = urlparse(url)
+            self.add_new_page(urlParse,0)
 
 
     @synchronized
