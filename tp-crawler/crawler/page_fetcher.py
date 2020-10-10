@@ -58,6 +58,7 @@ class PageFetcher(Thread):
         if self.obj_scheduler.can_fetch_page(url_returned[0]):
             return None
         else:
+            print(url_returned[0])
             binary_content = self.request_url(url_returned[0])
         
             if binary_content != None:
