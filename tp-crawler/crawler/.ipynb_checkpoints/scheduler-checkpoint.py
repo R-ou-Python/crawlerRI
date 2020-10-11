@@ -109,11 +109,7 @@ class Scheduler():
                     else:
                         return self.dic_url_per_domain[domain].pop(0) # remove url da fila
 
-<<<<<<< Updated upstream
-            time.sleep(self.TIME_LIMIT_BETWEEN_REQUESTS) # espera  o tempo entre requisicoes
-=======
             time.sleep(1)
->>>>>>> Stashed changes
         
         """
         TIME_LIMIT_BETWEEN_REQUESTS não é a melhor métrica de variável para isso.
