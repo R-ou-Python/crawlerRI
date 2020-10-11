@@ -14,14 +14,20 @@ class PageFetcher(Thread):
 
             obj_url: Instancia da classe ParseResult com a URL a ser requisitada.
         """
-        headers = {'user-agent': self.crawlerName}
-        response = requests.get(urlunparse(obj_url), headers=headers)
-        
-        if 'text/html' in response.headers['Content-Type']:
-            return response.content
-        
-        return None
-       
+        try:
+            headers = {'user-agent': self.crawlerName}
+            response = requests.get(urlunparse(obj_url), headers=headers)
+            if response != None:
+                if response.status_code != 200:
+                    return None
+                if 'text/html' in response.headers['Content-Type']:
+                    print(urlunparse(obj_url))
+                    return response.content
+    
+            return None
+        except:
+            return None
+
     def discover_links(self,obj_url,int_depth,bin_str_content):
         """
         Retorna os links do conteúdo bin_str_content da página já requisitada obj_url
@@ -45,24 +51,21 @@ class PageFetcher(Thread):
                 int_new_depth = 0
                 if urlParse.netloc == dominio:
                     int_new_depth = int_depth+1
-
+                
                 yield(urlParse, int_new_depth)
         
     def crawl_new_url(self):
         """
             Coleta uma nova URL, obtendo-a do escalonador
         """
-        
         url_returned = self.obj_scheduler.get_next_url()
-                
+        
         if self.obj_scheduler.can_fetch_page(url_returned[0]):
             return None
         else:
-            print(url_returned[0])
             binary_content = self.request_url(url_returned[0])
         
             if binary_content != None:
-                print(urlunparse(url_returned[0]))
                 return self.discover_links(url_returned[0], url_returned[1], binary_content)
             else:
                 return None
@@ -76,7 +79,7 @@ class PageFetcher(Thread):
         # Se não terminou de fazer o crawling
         
         while self.obj_scheduler.has_finished_crawl() == False:
-            # Pega todos os conjuntos de tuplas da crawl (retorno da discovery_links)
+            # Pega todos os conjuntos de tuplas da crawl (retorno da discovery_links
             generator = self.crawl_new_url()
             if generator != None:
                 self.obj_scheduler.count_fetched_page()

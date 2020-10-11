@@ -49,8 +49,7 @@ class Scheduler():
         if(self.int_page_count > self.int_page_limit):
             return True
         return False
-
-
+    
     @synchronized
     def can_add_page(self,obj_url,int_depth):
         """
@@ -110,7 +109,11 @@ class Scheduler():
                     else:
                         return self.dic_url_per_domain[domain].pop(0) # remove url da fila
 
+<<<<<<< Updated upstream
             time.sleep(self.TIME_LIMIT_BETWEEN_REQUESTS) # espera  o tempo entre requisicoes
+=======
+            time.sleep(1)
+>>>>>>> Stashed changes
         
         """
         TIME_LIMIT_BETWEEN_REQUESTS não é a melhor métrica de variável para isso.
@@ -129,9 +132,13 @@ class Scheduler():
         else:
             robotFileParser = urllib.robotparser.RobotFileParser()
             robotsTxt = obj_url.scheme + '://' + obj_url.netloc + '/robots.txt'
-            robotFileParser.set_url(robotsTxt)
-            robotFileParser.read()
-            self.dic_robots_per_domain[obj_url.netloc] = robotFileParser
-
-        return robotFileParser.can_fetch("*", urlunparse(obj_url))
-      
+            try:
+                robotFileParser.set_url(robotsTxt)
+                if (robotFileParser.read() == None):
+                    return None
+                robotFileParser.read()
+                self.dic_robots_per_domain[obj_url.netloc] = robotFileParser
+            
+                return robotFileParser.can_fetch("*", urlunparse(obj_url))
+            except:
+                return None
