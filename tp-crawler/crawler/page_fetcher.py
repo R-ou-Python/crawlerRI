@@ -74,7 +74,6 @@ class PageFetcher(Thread):
         """
             Executa coleta enquanto houver páginas a serem coletadas
         """
-        # Lista de URL vazias como faz?
         
         # Se não terminou de fazer o crawling
         

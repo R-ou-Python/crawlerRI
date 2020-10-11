@@ -115,11 +115,14 @@ class Scheduler():
         TIME_LIMIT_BETWEEN_REQUESTS não é a melhor métrica de variável para isso.
         Melhor tática possível é implementar exponential backoff
         """
+
+
     def can_fetch_page(self,obj_url):
         """
         Verifica, por meio do robots.txt se uma determinada URL pode ser coletada
         """
         
+        # verifica se o netloc do dominio consta no dicionario de robots per domain. Se verdadeiro, coleta seu value
         if (obj_url.netloc in self.dic_robots_per_domain):
             robotFileParser = self.dic_robots_per_domain[obj_url.netloc]
         else:
