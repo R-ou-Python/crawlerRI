@@ -21,14 +21,14 @@ class Domain():
 		else:
 			return True
 
-	def __hash__(self):
+	def __hash__(self): # associa um valor de retorno para o objeto
 		return hash(self.nam_domain)
 
 	def __eq__(self, domain):
 		return domain == self.nam_domain
 
-	def __str__(self):
+	def __str__(self): # retorna uma string que representa o objeto
 		return self.nam_domain
 
-	def __repr__(self):
+	def __repr__(self): # chama __str__
 		return str(self)
