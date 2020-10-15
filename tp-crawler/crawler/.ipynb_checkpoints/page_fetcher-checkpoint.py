@@ -6,7 +6,7 @@ from urllib.parse import urlparse, urlunparse, urljoin
 class PageFetcher(Thread):
     def __init__(self, obj_scheduler):
         self.obj_scheduler = obj_scheduler
-        self.crawlerName = "crawlbot"
+        self.crawlerName = "CrawlerBot(nathaclmpaulino.github.io/crawlerRI/infoCrawlerBot)"
 
     def request_url(self,obj_url):
         """
