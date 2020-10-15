@@ -61,6 +61,8 @@ class PageFetcher(Thread):
         url_returned = self.obj_scheduler.get_next_url()
         
         if self.obj_scheduler.can_fetch_page(url_returned[0]):
+            print(self.obj_scheduler.can_fetch_page(url_returned[0]))
+            print("oi")
             return None
         else:
             binary_content = self.request_url(url_returned[0])
