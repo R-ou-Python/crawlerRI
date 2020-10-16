@@ -123,25 +123,21 @@ class Scheduler():
         """
         Verifica, por meio do robots.txt se uma determinada URL pode ser coletada
         """
-
+        print(urlunparse(obj_url))
         # verifica se o netloc do dominio consta no dicionario de robots per domain. Se verdadeiro, coleta seu value
         if (obj_url.netloc in self.dic_robots_per_domain):
             robotFileParser = self.dic_robots_per_domain[obj_url.netloc]
         else:
             robotFileParser = urllib.robotparser.RobotFileParser()
             robotsTxt = obj_url.scheme + '://' + obj_url.netloc + '/robots.txt'
- 
-            response = requests.get(robotsTxt)
-            page = str(BeautifulSoup(response.content, "html.parser")) # get the html content to check if there is nofollow or noindex directives
-            print(page)
+            
             try:
                 robotFileParser.set_url(robotsTxt)
-                #print(robotFileParser.read())
                 if (robotFileParser.read() == "none"):
                     return None
                 robotFileParser.read()
                 self.dic_robots_per_domain[obj_url.netloc] = robotFileParser
-
-                return robotFileParser.can_fetch("*", urlunparse(obj_url))
             except:
                 return None
+
+        return robotFileParser.can_fetch("CrawlerBot(nathaclmpaulino.github.io/crawlerRI/infoCrawlerBot)", urlunparse(obj_url))

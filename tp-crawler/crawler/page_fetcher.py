@@ -21,7 +21,7 @@ class PageFetcher(Thread):
                 if response.status_code != 200:
                     return None
                 if 'text/html' in response.headers['Content-Type']:
-                    print(urlunparse(obj_url))
+                    # print(urlunparse(obj_url))
                     return response.content
     
             return None
@@ -35,6 +35,10 @@ class PageFetcher(Thread):
         soup = BeautifulSoup(bin_str_content, "html.parser")
         dominio = obj_url.netloc
         
+        for meta in soup.select('meta'):
+            if meta.get('name') == 'robots':
+                if (meta.get('content') == 'noindex') or (meta.get('content') == 'none') or (meta.get('content') == 'nofollow') : 
+                    return None    
         for link in soup.select('a'):
             
             if link.get('href') == None:
@@ -61,8 +65,6 @@ class PageFetcher(Thread):
         url_returned = self.obj_scheduler.get_next_url()
         
         if self.obj_scheduler.can_fetch_page(url_returned[0]):
-            print(self.obj_scheduler.can_fetch_page(url_returned[0]))
-            print("oi")
             return None
         else:
             binary_content = self.request_url(url_returned[0])
