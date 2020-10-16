@@ -123,7 +123,7 @@ class Scheduler():
         """
         Verifica, por meio do robots.txt se uma determinada URL pode ser coletada
         """
-        print(urlunparse(obj_url))
+
         # verifica se o netloc do dominio consta no dicionario de robots per domain. Se verdadeiro, coleta seu value
         if (obj_url.netloc in self.dic_robots_per_domain):
             robotFileParser = self.dic_robots_per_domain[obj_url.netloc]

@@ -21,7 +21,7 @@ class PageFetcher(Thread):
                 if response.status_code != 200:
                     return None
                 if 'text/html' in response.headers['Content-Type']:
-                    # print(urlunparse(obj_url))
+                    print(urlunparse(obj_url))
                     return response.content
     
             return None
