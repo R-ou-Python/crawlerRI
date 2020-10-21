@@ -84,11 +84,29 @@ class TermOccurrence():
 
     def __hash__(self):
     	return hash((self.doc_id,self.term_id))
-    def __eq__(self,other_occurrence:"TermOccurrence"):
+
+    def __eq__(self,other_occurrence:"TermOccurrence"): #  retorna true se for igual
+        if other_occurrence is None:
+            return False
+        # se o id do termo dela e o id do documento forem iguais
+        if (self.doc_id == other_occurrence.doc_id) and (self.term_id == other_occurrence.term_id):
+            return True
+        else:
+            return False
+
+
+    # Retorna verdadeiro se o objeto corrrente self é menor do que o objeto passado como parametro
+    def __lt__(self,other_occurrence:"TermOccurrence"):
+        if other_occurrence is None:
+            return True
+
+        if (self.term_id < other_occurrence.term_id):
+            return True
+        elif (self.term_id == other_occurrence.term_id):
+            if (self.doc_id < other_occurrence.doc_id): 
+                return True
         return False
 
-    def __lt__(self,other_occurrence:"TermOccurrence"):
-        return False
 
     def __str__(self):
         return f"(term_id:{self.term_id} doc: {self.doc_id} freq: {self.term_freq})"
@@ -108,11 +126,20 @@ class HashIndex(Index):
     def add_index_occur(self, entry_dic_index:List[TermOccurrence], doc_id:int, term_id:int, term_freq:int):
         entry_dic_index.append(TermOccurrence(doc_id, term_id, term_freq))
 
+    # Retorna a lista de ocorrencias de um determinado termo.
     def get_occurrence_list(self,term: str)->List:
-        return []
-
+        if term not in self.dic_index: # caso o termo nao exista, retorna vazio
+            return []
+        else: # se esta la, retorna a lista de ocorrencia
+            return self.dic_index[term]
+            
+    # Retorna a quantidade de documentos que possuem um determinado termo
     def document_count_with_term(self,term:str) -> int:
-        return 0
+        occurrence = self.get_occurrence_list(term)
+        if len(occurrence) == 0: # Se o retorno for uma lista vazia, não ha documentos relacionados ao termo
+            return 0
+        else: # Se tiver, retorna a quantidade de docs, que é equivalente ao tam da lista
+            return len(occurrence)
 
 
 
@@ -130,8 +157,9 @@ class TermFilePosition:
         return f"term_id: {self.term_id}, doc_count_with_term: {self.doc_count_with_term}, term_file_start_pos: {self.term_file_start_pos}"
     def __repr__(self):
         return str(self)
+    
 
-class FileIndex(Index):
+class FileIndex(Index): # armazena as ocorrencias em arquivo
 
     TMP_OCCURRENCES_LIMIT = 1000000
 
