@@ -12,6 +12,7 @@ class Index:
         self.dic_index = {}
         self.set_documents = set()
 
+        
     def index(self, term:str, doc_id:int, term_freq:int):
         if term not in self.dic_index:
             int_term_id = len(self.dic_index) + 1
@@ -80,7 +81,14 @@ class TermOccurrence():
         self.term_freq = term_freq
 
     def write(self, idx_file):
-        pass
+        # salva na ordem certa no arquivo
+        with open(idx_file,"wb+") as file:
+            print(file.tell())
+            file.write(self.term_id.to_bytes(4,byteorder="big"))
+            file.write(self.doc_id.to_bytes(4,byteorder="big"))
+            file.write(self.term_freq.to_bytes(4,byteorder="big"))
+            print(file.tell())
+
 
     def __hash__(self):
     	return hash((self.doc_id,self.term_id))
@@ -165,7 +173,9 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
 
     def __init__(self):
         super().__init__()
-
+        self.contador = 0
+        self.old_file = ""
+        self.destino_file = "new_file_2.idx"
         self.lst_occurrences_tmp = []
         self.idx_file_counter = 0
         self.str_idx_file_name = "occur_idx_file"
@@ -182,37 +192,88 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
         if len(self.lst_occurrences_tmp) >= FileIndex.TMP_OCCURRENCES_LIMIT:
             self.save_tmp_occurrences()
 
+
     def next_from_list(self) -> TermOccurrence:
-        return None
+        if len(self.lst_occurrences_tmp) == 0:
+            return None
+        else:
+            return self.lst_occurrences_tmp.pop(0) #retorna o primeiro termo (removido da lista)
+
 
     def next_from_file(self,file_idx) -> TermOccurrence:
             #next_from_file = pickle.load(file_idx)
-        bytes_doc_id = file_idx.read(4)
-        if not bytes_doc_id:
-            return None
+        
+        with open(file_idx, "rb") as file:
+            #bytes_doc_id = file_idx.read(4)
+            #if not bytes_doc_id:
+            #    return None
+        
+            file.seek(self.contador*4)
+                
+            doc_id = int.from_bytes(file.read(4),byteorder='big')
+            term_id = int.from_bytes(file.read(4),byteorder='big')
+            term_freq = int.from_bytes(file.read(4),byteorder='big')
+            self.contador = self.contador + 3
+            
+            if doc_id == 0 or term_freq==0 or term_id==0:
+                return None
         #seu código aqui :)
 
         return TermOccurrence(doc_id, term_id, term_freq)
 
 
     def save_tmp_occurrences(self):
-
+        
         #ordena pelo term_id, doc_id
         #Para eficiencia, todo o codigo deve ser feito com o garbage
         #collector desabilitado
         gc.disable()
-
-        #ordena pelo term_id, doc_id
-        for i in self.lst_occurrences_tmp:
+        
+        
+        if self.idx_file_counter == 0:
+            self.str_idx_file_name = None
+            self.str_idx_file_name = "occur_index_0"
+            next_list = self.next_from_list()
+            tam = len(self.lst_occurrences_tmp)
+            for i in range(0,tam):
+                next_list.write(self.str_idx_file_name)
+                
+        else:
+            self.old_file = self.str_idx_file_name
+            self.idx_file_counter = self.idx_file_counter + 1
+            self.str_idx_file_name = "occur_index_" + str(self.idx_file_counter)
             
-            
-        ### Abra um arquivo novo faça a ordenação externa: compar sempre a primeira posição
-        ### da lista com a primeira possição do arquivo usando os métodos next_from_list e next_from_file
-        ### para armazenar no novo indice ordenado
+        
+        
+            #ordena pelo term_id, doc_id -- Com a sobrescrita dos métodos, a sorted vai ordenar por term_id
+            list_sorted = sorted(self.lst_occurrences_tmp)
+            self.lst_occurrences_tmp = list_sorted
 
+            ### Abra um arquivo novo faça a ordenação externa: compar sempre a primeira posição
+            ### da lista com a primeira posição do arquivo usando os métodos next_from_list e next_from_file
+            ### para armazenar no novo indice ordenado
+            next_list = self.next_from_list()
+            next_file = self.next_from_file(self.old_file)
 
+            while(next_list or next_file):
+                if next_list <= next_file: # compara os term_id e pega o menor pra salvar no arquivo
+                    next_list.write(self.str_idx_file_name)
+                    next_list = self.next_from_list()
+                else:
+                    next_file.write(self.str_idx_file_name)
+                    next_file = self.next_from_file(self.old_file)
+        
 
+            #remove old file
+            try:
+                os.remove(self.old_file)
+            except OSError as e:
+                print(e)
+            else:
+                print("File deleted successfully")
+        
         gc.enable()
+        self.lst_occurrences_tmp = [] # added
 
     def finish_indexing(self):
         if len(self.lst_occurrences_tmp) > 0:
