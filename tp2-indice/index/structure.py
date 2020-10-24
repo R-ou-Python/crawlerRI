@@ -88,7 +88,7 @@ class TermOccurrence():
             file.write(self.doc_id.to_bytes(4,byteorder="big"))
             file.write(self.term_freq.to_bytes(4,byteorder="big"))
             print(file.tell())
-
+        print('Escrita concluida')
 
     def __hash__(self):
     	return hash((self.doc_id,self.term_id))
@@ -202,8 +202,8 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
 
     def next_from_file(self,file_idx) -> TermOccurrence:
             #next_from_file = pickle.load(file_idx)
-        
-        with open(file_idx, "rb") as file:
+        print('Arquivo a ser lido: ' + str(file_idx.name))
+        with open(file_idx.name, "rb") as file:
             #bytes_doc_id = file_idx.read(4)
             #if not bytes_doc_id:
             #    return None
@@ -215,11 +215,11 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
             term_freq = int.from_bytes(file.read(4),byteorder='big')
             self.contador = self.contador + 3
             
-            if doc_id == 0 or term_freq==0 or term_id==0:
+            if doc_id == 0 or term_freq == 0 or term_id == 0:
                 return None
         #seu código aqui :)
 
-        return TermOccurrence(doc_id, term_id, term_freq)
+        return TermOccurrence(term_id, doc_id, term_freq)
 
 
     def save_tmp_occurrences(self):
@@ -229,22 +229,35 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
         #collector desabilitado
         gc.disable()
         
-        
+        print('Iniciando save tmp')
+        print(self.lst_occurrences_tmp)
+    
         if self.idx_file_counter == 0:
             self.str_idx_file_name = None
             self.str_idx_file_name = "occur_index_0"
-            next_list = self.next_from_list()
+            
+            # Deve-se ordenar a lista de ocorrências 
+            list_sorted = sorted(self.lst_occurrences_tmp)
+            self.lst_occurrences_tmp = list_sorted
+            
+            print('Sorted List')
+            print(self.lst_occurrences_tmp)
+            
             tam = len(self.lst_occurrences_tmp)
-            for i in range(0,tam):
+            print('Tamanho da fila: ' + str(tam))
+            
+            for i in range(tam):
+                print('Valor da iteração: ' + str(i))
+                next_list = self.next_from_list()
+                print('Objeto a ser escrito: ' + str(next_list))
+                print('Escrito no arquivo: ' + self.str_idx_file_name)
                 next_list.write(self.str_idx_file_name)
-                
+
         else:
             self.old_file = self.str_idx_file_name
             self.idx_file_counter = self.idx_file_counter + 1
             self.str_idx_file_name = "occur_index_" + str(self.idx_file_counter)
             
-        
-        
             #ordena pelo term_id, doc_id -- Com a sobrescrita dos métodos, a sorted vai ordenar por term_id
             list_sorted = sorted(self.lst_occurrences_tmp)
             self.lst_occurrences_tmp = list_sorted
@@ -252,9 +265,12 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
             ### Abra um arquivo novo faça a ordenação externa: compar sempre a primeira posição
             ### da lista com a primeira posição do arquivo usando os métodos next_from_list e next_from_file
             ### para armazenar no novo indice ordenado
+            
+            print('Abrindo arquivos')
             next_list = self.next_from_list()
             next_file = self.next_from_file(self.old_file)
 
+            print(self.old_file)
             while(next_list or next_file):
                 if next_list <= next_file: # compara os term_id e pega o menor pra salvar no arquivo
                     next_list.write(self.str_idx_file_name)
