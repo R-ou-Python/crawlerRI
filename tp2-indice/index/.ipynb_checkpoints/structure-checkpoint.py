@@ -169,7 +169,6 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
 
     def __init__(self):
         super().__init__()
-        self.contador = 0
         
         self.lst_occurrences_tmp = []
         self.idx_file_counter = 0
@@ -200,13 +199,10 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
         # Tratar nome de arquivo igual a None (aplicado na primeira iteração do save_tmp_occurrences)
         if(file_idx is None):
             return None
-        
-        file_idx.seek(self.contador*4)
                 
         doc_id = int.from_bytes(file_idx.read(4),byteorder='big')
         term_id = int.from_bytes(file_idx.read(4),byteorder='big')
         term_freq = int.from_bytes(file_idx.read(4),byteorder='big')
-        self.contador = self.contador + 3
         
         if doc_id == 0 or term_freq == 0 or term_id == 0:
             return None
@@ -218,7 +214,6 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
         #ordena pelo term_id, doc_id
         #Para eficiencia, todo o codigo deve ser feito com o garbage collector desabilitado
         gc.disable()
-        self.contador = 0;
         
         self.lst_occurrences_tmp = sorted(self.lst_occurrences_tmp)
         
@@ -250,8 +245,6 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
         if self.str_idx_file_name:
             os.remove(self.str_idx_file_name)
         
-        self.contador = 0;
-        
         # Ataualizar nome do arquivo corrente
         self.str_idx_file_name = str_idx_new_file_name
         
@@ -274,8 +267,6 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
         for str_term,obj_term in self.dic_index.items():
             dic_ids_por_termo[obj_term.term_id] = obj_term
           
-        
-        self.contador = 0
         with open(self.str_idx_file_name,'rb') as idx_file:
             #navega nas ocorrencias para atualizar cada termo em dic_ids_por_termo apropriadamente
             next_file = self.next_from_file(idx_file)
