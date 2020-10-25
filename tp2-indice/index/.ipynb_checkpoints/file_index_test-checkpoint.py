@@ -12,6 +12,7 @@ class FileIndexTest(unittest.TestCase):
         self.assertEqual(len( obj_index.lst_occurrences_tmp),0,"A lista de ocorrencias deve ser zerada após chamar o método save_tmp_occurrences")
         last_occur = TermOccurrence(float('-inf'),float('-inf'),10)
         set_file_occurrences = set()
+ 
         with open(obj_index.str_idx_file_name,"rb") as idx_file:
             occur = obj_index.next_from_file(idx_file)
             while occur is not None:
@@ -87,6 +88,7 @@ class FileIndexTest(unittest.TestCase):
 
         print(f"Tamanho de cada ocorrência: {int_size_of_occur} bytes")
         self.index.save_tmp_occurrences()
+  
         #verifica, para cada posição
         self.index.dic_index = {"casa":TermFilePosition(1),
                                 "verde":TermFilePosition(2),
@@ -99,12 +101,11 @@ class FileIndexTest(unittest.TestCase):
         [self.assertEqual(self.index.dic_index[arr_termos[i]].term_id,i+1,f"O id do termo {i+1} mudou para {self.index.dic_index[arr_termos[i]].term_id}") for i in range(4)]
 
 
-
-        #testa se a quantidade de documentos que possuem um determinado termo está correto
+        #testa posição inicial
         arr_pos_por_termo = [0,int_size_of_occur*3,int_size_of_occur*6,int_size_of_occur*7]
         arr_pos = [1,4,7,8]
         [self.assertEqual(self.index.dic_index[arr_termos[i]].term_file_start_pos,arr_pos_por_termo[i],f"A posição inicial do termo de id {i+1} no arquivo seria {arr_pos_por_termo[i]} (ou seja, antes da {arr_pos[i]}ª ocorrencia) e não {self.index.dic_index[arr_termos[i]].term_file_start_pos}") for i in range(4)]
-
+            
         #testa se a quantidade de documentos que possuem um determinado termo está correto
         arr_doc_por_termo = [3,3,1,2]
         [self.assertEqual(self.index.dic_index[arr_termos[i]].doc_count_with_term,arr_doc_por_termo[i],f"A quantidade de documentos que possuem o termo de id {self.index.dic_index[arr_termos[i]].term_id} seria {arr_doc_por_termo[i]} e não {self.index.dic_index[arr_termos[i]].doc_count_with_term}") for i in range(4)]
