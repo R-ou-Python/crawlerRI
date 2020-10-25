@@ -291,6 +291,8 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
                 position = position + 1
         
     def get_occurrence_list(self,term: str)->List:
+        if term in self.dic_index:
+            return [self.dic_index[term]]
         return []
     def document_count_with_term(self,term:str) -> int:
         if term in self.dic_index:

@@ -109,6 +109,10 @@ class FileIndexTest(unittest.TestCase):
         #testa se a quantidade de documentos que possuem um determinado termo está correto
         arr_doc_por_termo = [3,3,1,2]
         [self.assertEqual(self.index.dic_index[arr_termos[i]].doc_count_with_term,arr_doc_por_termo[i],f"A quantidade de documentos que possuem o termo de id {self.index.dic_index[arr_termos[i]].term_id} seria {arr_doc_por_termo[i]} e não {self.index.dic_index[arr_termos[i]].doc_count_with_term}") for i in range(4)]
+        
+        print(self.index.document_count_with_term("verde"))
+
+
 
 if __name__ == "__main__":
     unittest.main()
