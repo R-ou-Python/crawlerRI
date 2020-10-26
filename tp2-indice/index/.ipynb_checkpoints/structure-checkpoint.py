@@ -302,13 +302,15 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
             termo_busca = obj_TermFilePosition.term_id
             
             with open(self.str_idx_file_name, 'rb') as idx_file:
-                # Pegando o primeiro TermOcurrence da lista e do arquivo
+                # Posiciona a leitura do arquivo no início da listagem do termo buscado
+                idx_file.seek(self.dic_index[term].term_file_start_pos)
+                
+                # Pegando o primeiro TermOcurrence respectivo ao term buscado
                 next_file = self.next_from_file(idx_file)
 
-                # Percorre o arquivo em busa de ocorrencias do term_id e adiciona na lista
-                while(next_file):
-                    if termo_busca == next_file.term_id:
-                        occurrence_list.append(next_file)
+                # Percorre o arquivo em busca de novas ocorrências de term
+                while(next_file is not None and termo_busca == next_file.term_id):
+                    occurrence_list.append(next_file)
                     next_file = self.next_from_file(idx_file)
             return occurrence_list
     
