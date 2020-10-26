@@ -269,18 +269,19 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
           
         with open(self.str_idx_file_name,'rb') as idx_file:
             #navega nas ocorrencias para atualizar cada termo em dic_ids_por_termo apropriadamente
+            # por atualizar, entende-se colocar um valor diferente do 0 colocado por default
             next_file = self.next_from_file(idx_file)
             position = 0
             while(next_file):
-                # Item do dicionário
+                # Item do dicionário - pega os values da proxima key no dicionario
                 item_dic = dic_ids_por_termo[next_file.term_id]
                 
-                # Adicionando contagem
+                # Adicionando contagem - Quantas vezes o termo aparece no arquivo
                 newCount = item_dic.doc_count_with_term
                 if newCount is None : newCount = 0
                 item_dic.doc_count_with_term = newCount + 1
                 
-                # Adicionando posição inicial
+                # Adicionando posição inicial to termo dentro do arquivo final - occur_index_<indice>
                 if item_dic.term_file_start_pos is None:
                     item_dic.term_file_start_pos = position * 12
                 
@@ -290,10 +291,28 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
                 next_file = self.next_from_file(idx_file)
                 position = position + 1
         
+        
     def get_occurrence_list(self,term: str)->List:
-        if term in self.dic_index:
-            return [self.dic_index[term]]
-        return []
+        occurrence_list = []
+        # faz a busca no dicionario e pega os objetos TermFilePosition
+        if term not in self.dic_index:
+            return occurrence_list
+        else:
+            obj_TermFilePosition = self.dic_index[term]
+            termo_busca = obj_TermFilePosition.term_id
+            
+            with open(self.str_idx_file_name, 'rb') as idx_file:
+                # Pegando o primeiro TermOcurrence da lista e do arquivo
+                next_file = self.next_from_file(idx_file)
+
+                # Percorre o arquivo em busa de ocorrencias do term_id e adiciona na lista
+                while(next_file):
+                    if termo_busca == next_file.term_id:
+                        occurrence_list.append(next_file)
+                    next_file = self.next_from_file(idx_file)
+            return occurrence_list
+    
+    
     def document_count_with_term(self,term:str) -> int:
         if term in self.dic_index:
             return self.dic_index[term].doc_count_with_term
