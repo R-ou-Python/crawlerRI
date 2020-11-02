@@ -209,6 +209,7 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
         
         return  TermOccurrence(term_id, doc_id, term_freq)   
 
+    
     def save_tmp_occurrences(self):
         
         #ordena pelo term_id, doc_id
@@ -264,8 +265,8 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
         # id_termo -> obj_termo armazene-o em dic_ids_por_termo
         dic_ids_por_termo = {}
         
-        for str_term,obj_term in self.dic_index.items():
-            dic_ids_por_termo[obj_term.term_id] = obj_term
+        for str_term, obj_term in self.dic_index.items(): # separa dict em chave, valor
+            dic_ids_por_termo[obj_term.term_id] = obj_term # obj do tipo TermFilePosition(term_id,term_file_start_pos, doc_count_with_term)
           
         with open(self.str_idx_file_name,'rb') as idx_file:
             #navega nas ocorrencias para atualizar cada termo em dic_ids_por_termo apropriadamente
@@ -309,6 +310,7 @@ class FileIndex(Index): # armazena as ocorrencias em arquivo
                 next_file = self.next_from_file(idx_file)
 
                 # Percorre o arquivo em busca de novas ocorrências de term
+                # como o term_id encontra-se agrupado no arquivo, a partir do momento que lemos outro, sai do while
                 while(next_file is not None and termo_busca == next_file.term_id):
                     occurrence_list.append(next_file)
                     next_file = self.next_from_file(idx_file)
