@@ -5,7 +5,7 @@ from nltk.tokenize import word_tokenize
 from collections import Counter
 import nltk
 import os
-
+from index.structure import *
 
 class Cleaner:
     def __init__(self,stop_words_file:str,language:str,
@@ -98,8 +98,20 @@ class HTMLIndexer:
         return dic_word_count
     
     def index_text(self,doc_id:int, text_html:str):
+        '''
+        **Atividade 13 - método index_text: ** Implemente o método `index_text` que deverá (1) converter o HTML para texto simples usando `HTMLIndexer.cleaner`; (2) converter o texto em um dicionário de ocorrencias de palavras com sua frequencia (metodo da atividade 12); e (3) indexar cada palavra deste dicionário.
+        '''
+        # Passo 1: Converter o HTML para um texto simples
         
-        pass
+        plain_text = self.cleaner.html_to_plain_text(text_html)
+        
+        # Passo 2: Converter o texto em um dicionário de ocorrências
+        
+        dict_word_count = self.text_word_count(plain_text)
+        
+        # Passo 3: Indexar cada palavra
+        for key, freq in dict_word_count.items():
+            self.index.index(key, doc_id, freq)
 
     def index_text_dir(self,path:str):
 
