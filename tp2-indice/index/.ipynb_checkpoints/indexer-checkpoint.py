@@ -114,6 +114,26 @@ class HTMLIndexer:
             self.index.index(key, doc_id, freq)
 
     def index_text_dir(self,path:str):
-
+        # Percorre os subdiretórios de path
         for str_sub_dir in os.listdir(path):
-            path_sub_dir = f"{path}/{str_sub_dir}"
+            # Join para montar o path completo dos subdiretórios
+            path_sub_dir = os.path.join(path, str_sub_dir)
+            
+            #Percorre o conteúdo do subdiretório
+            for str_arq_sub_dir in os.listdir(path_sub_dir):
+                # Join para montar o path completo dos arquivos
+                path_arq_sub_dir = os.path.join(path_sub_dir, str_arq_sub_dir)
+                
+                # Acessa apenas os arquivos .html
+                if path_arq_sub_dir.lower().endswith(".html"):
+                    # Pega o doc_id através do nome do arquivo
+                    try:
+                        doc_id = int(os.path.splitext(str_arq_sub_dir)[0])
+                    except:
+                        raise Exception("Nome do arquivo não é um inteiro")
+                        
+                    # Leitura do arquivo e indexação
+                    with open(path_arq_sub_dir, 'r') as html_file:
+                        text_html = html_file.read()
+                        #print(text_html)
+                        self.index_text(doc_id, text_html)
