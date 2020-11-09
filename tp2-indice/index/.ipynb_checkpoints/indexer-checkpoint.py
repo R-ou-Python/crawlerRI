@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 import string
 from nltk.tokenize import word_tokenize
 from collections import Counter
-import nltk
 import os
 from index.structure import *
 
@@ -95,7 +94,7 @@ class HTMLIndexer:
                         perform_stemming=True)
     def __init__(self,index):
         self.index = index
-        #nltk.download('punkt')
+
     def text_word_count(self,plain_text:str):
         
         words = word_tokenize(plain_text)
