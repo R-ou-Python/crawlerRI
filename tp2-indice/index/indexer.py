@@ -66,11 +66,21 @@ class Cleaner:
     def preprocess_word(self,term:str) -> str:
         # Se não for pontuação e não for stopword
         '''Agora você irá fazer o método `preprocess_word` ele irá receber como parametro uma palavra e irá verificar se é uma palavra válida de ser indexada. Caso não seja, retornará None. Caso contrário, irá retornar a palvra preprocessada. Uma palavra válida a ser indexada é aquela que não é pontuação e não é stopword (caso `perform_stop_words_removal = True`). Para que seja feito o preprocessamento você deverá: transformar o texto para minúsculas, remover acento (se `perform_accents_removal=True`), fazer o stemming (se `perform_stemming = True`).'''
-        if term not in self.set_punctuation and not self.is_stop_word(term):
+        if term not in self.set_punctuation and ( not self.perform_stop_words_removal or not self.is_stop_word(term)):
             # Será indexada após remover fazer pre processamento
-            toLower = term.lower()
-            removed = self.remove_accents(toLower)
-            return self.word_stem(removed)
+            
+            # Transforma em minúscula
+            term = term.lower()
+            
+            # Remove acentos caso perform_accents_removal = True
+            if self.perform_accents_removal:
+                term = self.remove_accents(term)
+                
+            # Faz Stemming caso perform_stemming = true
+            if self.perform_stemming:
+                term = self.word_stem(term)
+            
+            return term
         else:
             return None
     
