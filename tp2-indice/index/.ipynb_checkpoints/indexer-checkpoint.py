@@ -95,9 +95,9 @@ class HTMLIndexer:
                         perform_stemming=True)
     def __init__(self,index):
         self.index = index
-
+        #nltk.download('punkt')
     def text_word_count(self,plain_text:str):
-        nltk.download('punkt')
+        
         words = word_tokenize(plain_text)
         new_word_array = []
         for term in words:
@@ -145,5 +145,4 @@ class HTMLIndexer:
                     # Leitura do arquivo e indexação
                     with open(path_arq_sub_dir, 'r') as html_file:
                         text_html = html_file.read()
-                        #print(text_html)
                         self.index_text(doc_id, text_html)
