@@ -146,9 +146,6 @@ class HashIndex(Index):
             return len(occurrence)
 
 
-
-
-
 class TermFilePosition:
     def __init__(self,term_id:int,  term_file_start_pos:int=None, doc_count_with_term:int = None):
         self.term_id = term_id
